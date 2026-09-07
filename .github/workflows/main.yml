@@ -7,7 +7,6 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # Job 1: Verify Headless Import & Syntax
   validate-project:
     runs-on: ubuntu-latest
     steps:
@@ -17,13 +16,12 @@ jobs:
       - name: Setup Godot Engine
         uses: chickensoft-games/setup-godot@v2
         with:
-          godot-version: "4.3.0"
+          version: "4.3.0" # Changed 'godot-version' to 'version'
           use-dotnet: false
 
       - name: Verify Headless Import
         run: godot --headless --editor --quit
 
-  # Job 2: Automated Unit Testing
   run-tests:
     needs: validate-project
     runs-on: ubuntu-latest
@@ -31,11 +29,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          lfs: true # Ensures UI/branding assets load correctly
+          lfs: true
 
       - name: Execute GdUnit4 Tests
-        uses: godot-gdunit-labs/gdUnit4-action@v1
+        uses: godot-gdunit-labs/gdUnit4-action@v1.1.1
         with:
           godot-version: "4.3.0"
-          paths: "res://test" # Directory where your component test scripts live
+          paths: "res://test"
           timeout: 5
