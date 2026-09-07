@@ -1,0 +1,41 @@
+name: Godot Component Library CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # Job 1: Verify Headless Import & Syntax
+  validate-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Godot Engine
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          godot-version: "4.3.0"
+          use-dotnet: false
+
+      - name: Verify Headless Import
+        run: godot --headless --editor --quit
+
+  # Job 2: Automated Unit Testing
+  run-tests:
+    needs: validate-project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          lfs: true # Ensures UI/branding assets load correctly
+
+      - name: Execute GdUnit4 Tests
+        uses: godot-gdunit-labs/gdUnit4-action@v1
+        with:
+          godot-version: "4.3.0"
+          paths: "res://test" # Directory where your component test scripts live
+          timeout: 5
